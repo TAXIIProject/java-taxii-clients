@@ -1,0 +1,46 @@
+apply plugin: 'java'
+
+sourceCompatibility = '1.7'
+
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+// NetBeans will automatically add "run" and "debug" tasks relying on the
+// "mainClass" property. You may however define the property prior executing
+// tasks by passing a "-PmainClass=<QUALIFIED_CLASS_NAME>" argument.
+//
+// Note however, that you may define your own "run" and "debug" task if you
+// prefer. In this case NetBeans will not add these tasks but you may rely on
+// your own implementation.
+if (!hasProperty('mainClass')) {
+    ext.mainClass = 'org.mitre.taxii.client.example.DiscoveryClient'
+}
+
+repositories {
+    mavenCentral()
+    // You may define additional repositories, or even remove "mavenCentral()".
+    // Read more about repositories here:
+    //   http://www.gradle.org/docs/current/userguide/dependency_management.html#sec:repositories
+}
+
+dependencies {
+    // TODO: Add dependencies here ...
+    // You can read more about how to add dependency here:
+    //   http://www.gradle.org/docs/current/userguide/dependency_management.html#sec:how_to_declare_your_dependencies
+    testCompile group: 'junit', name: 'junit', version: '4.10'
+    
+    compile 'commons-cli:commons-cli:1.2'
+    compile 'javax.xml.bind:jaxb-api:2.2.+'
+    compile 'org.jvnet.jaxb2_commons:jaxb2-basics-runtime:0.6.5'
+    compile 'net.sf.saxon:Saxon-HE:9.5.1-5'
+    compile 'org.apache.httpcomponents:httpclient:4.3.5'
+    compile 'org.apache.httpcomponents:httpclient-cache:4.3.5'
+    compile 'org.apache.httpcomponents:httpmime:4.3.5'
+    compile 'org.apache.httpcomponents:fluent-hc:4.3.5'    
+    compile files('../java-taxii/build/libs/java-taxii.jar')
+}
+
+task allJar(type: Jar) {
+    baseName = project.name + "-all"
+    from {configurations.compile.collect {it.isDirectory() ? it : zipTree(it) }}
+    with jar
+}
