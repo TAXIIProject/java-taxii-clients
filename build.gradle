@@ -23,8 +23,8 @@ repositories {
 }
 
 dependencies {
-    // TODO: Add dependencies here ...
-    // You can read more about how to add dependency here:
+    // Add dependencies here ...
+    // You can read more about how to add dependencies here:
     //   http://www.gradle.org/docs/current/userguide/dependency_management.html#sec:how_to_declare_your_dependencies
     testCompile group: 'junit', name: 'junit', version: '4.10'
     
@@ -44,3 +44,16 @@ task allJar(type: Jar) {
     from {configurations.compile.collect {it.isDirectory() ? it : zipTree(it) }}
     with jar
 }
+
+task dist << {
+    ant.zip(destfile: "build/java-taxii-clients.zip") {
+        fileset(dir: ".", includes: "README.txt, LICENSE.txt") // The all important readme and license.
+        fileset(dir: "build/libs", includes: "java-taxii-clients-all.jar") // The All-in-one .jar
+        zipfileset(dir: "scripts", includes: "*.sh", prefix: "sh") // Get all the .sh scripts.
+        zipfileset(dir: "scripts", includes: "*.bat", prefix: "bat") // Get all the .bat scripts.        
+    }
+}
+
+allJar.dependsOn compileJava
+dist.dependsOn allJar
+
