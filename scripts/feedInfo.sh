@@ -1,2 +1,2 @@
 #!
-java -cp ../build/libs/SampleTaxiiClients-all.jar org.mitre.taxii.client.example.FeedInformationClient10 $*
+java -cp ../java-taxii-clients-all.jar org.mitre.taxii.client.example.FeedInformationClient10 $*

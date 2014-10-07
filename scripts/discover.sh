@@ -1,3 +1,3 @@
 #!
-java -cp ../build/libs/SampleTaxiiClients-all.jar org.mitre.taxii.client.example.DiscoveryClient $*
+java -cp ../java-taxii-clients-all.jar org.mitre.taxii.client.example.DiscoveryClient $*
 
