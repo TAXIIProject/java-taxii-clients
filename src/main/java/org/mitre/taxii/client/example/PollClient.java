@@ -4,16 +4,11 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import javax.xml.bind.DatatypeConverter;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.mitre.taxii.messages.xml11.DiscoveryRequest;
 import org.mitre.taxii.messages.xml11.MessageHelper;
 import org.mitre.taxii.messages.xml11.PollRequest;
 
@@ -43,7 +38,7 @@ public class PollClient extends AbstractClient {
         options.addOption("begin_timestamp", true, "The begin timestamp (format: YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm) for the poll request. Defaults to none.");
         options.addOption("end_timestamp", true, "The end timestamp (format: YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm) for the poll request. Defaults to none.");
         options.addOption("subscription_id", true, "The Subscription ID for the poll request. Defaults to none.");
-        options.addOption("dest_dir", true, "The directory to save Content Blocks to. Defaults to the current directory.");
+//        options.addOption("dest_dir", true, "The directory to save Content Blocks to. Defaults to the current directory.");
         
         cli.parse(args);
         CommandLine cmd = cli.getCmd();
@@ -53,7 +48,7 @@ public class PollClient extends AbstractClient {
         String beginStr = cmd.hasOption("begin_timestamp") ? cmd.getOptionValue("begin_timestamp") : null;
         String endStr = cmd.hasOption("end_timestamp") ? cmd.getOptionValue("end_timestamp") : null;
         String subId = cmd.hasOption("subscription_id") ? cmd.getOptionValue("subscription_id") : null;
-        String dest = cmd.hasOption("dest_dir") ? cmd.getOptionValue("dest_dir") : ".";
+//        String dest = cmd.hasOption("dest_dir") ? cmd.getOptionValue("dest_dir") : ".";
         
 
         taxiiClient = generateClient(cmd);

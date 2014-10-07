@@ -88,7 +88,7 @@ public class InboxClient extends AbstractClient {
         // Handle the content file.
         // Make the GIANT assumption that the input file is XML and parse it as such.
         // If not, and the file is XML, it will get escaped when marshaled. e.g. "<" becomes "&lt;".
-                // Create a DOM Node from an XML string.
+        // Create a DOM Node from an XML string.
         // JAXB can handle a generic DOM NODE, but a String it will escape and treat as a String - not XML.
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();

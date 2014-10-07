@@ -88,7 +88,7 @@ abstract class AbstractClient {
         if (cmd.hasOption("cert") && cmd.hasOption("key")) {
         }
 */        
-                
+                        
         client.setHttpclient(builder.build());
         return client;
     }    
