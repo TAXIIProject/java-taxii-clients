@@ -26,7 +26,7 @@ public class Cli {
         // Options common to all client apps.
         options.addOption("h", "help", false, "show help.");
         options.addOption("v", "verbose", false, "Turn on verbose mode.");
-        Option urlOption = new Option("u", "url", true, "REQUIRED. The URL of the TAXII service provider to connect to. (e.g. http://taxiitest.mitre.org:80/service/discovery/");
+        Option urlOption = new Option("u", "url", true, "REQUIRED. The URL of the TAXII service provider to connect to. (e.g. http://taxiitest.mitre.org:80/services/discovery/");
         urlOption.setRequired(true);
         options.addOption(urlOption);
         
