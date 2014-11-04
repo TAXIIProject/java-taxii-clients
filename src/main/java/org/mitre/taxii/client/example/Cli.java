@@ -25,7 +25,7 @@ public class Cli {
     public Cli() {        
         // Options common to all client apps.
         options.addOption("h", "help", false, "show help.");
-        options.addOption("v", "verbose", false, "Turn on verbose mode.");
+//        options.addOption("v", "verbose", false, "Turn on verbose mode.");
         Option urlOption = new Option("u", "url", true, "REQUIRED. The URL of the TAXII service provider to connect to. (e.g. http://taxiitest.mitre.org:80/services/discovery/");
         urlOption.setRequired(true);
         options.addOption(urlOption);
@@ -37,6 +37,7 @@ public class Cli {
         options.addOption("username", true, "The username to authenticate with.");
         options.addOption("pass", "password", true, "The password to authenticate with." );
         options.addOption("proxy", true, "A proxy to use (e.g., http://example.com:80/). Omit this to use the system proxy.");
+        options.addOption("x","xmloutput", false, "If present, the raw XML of the response will be printed to standard out. Otherwise, a \"Rich\" output will be presented.");
     }
     
     public void parse(String[] args) {        
@@ -51,7 +52,7 @@ public class Cli {
     
     private void help() {
         HelpFormatter hf = new HelpFormatter();
-        hf.printHelp("DiscoveryClient", options); //TODO: Populate the command being executed.
+        hf.printHelp("TAXII Client", options); //TODO: Populate the command being executed.
         System.exit(0);
     }
 

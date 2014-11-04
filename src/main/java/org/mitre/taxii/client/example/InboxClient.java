@@ -98,14 +98,7 @@ public class InboxClient extends AbstractClient {
         cb.setContent(factory.createAnyMixedContentType().withContent(content));
         
         request.withContentBlocks(cb);
-        
-        if (cmd.hasOption("verbose")) {
-            System.out.println(taxiiXml.marshalToString(request, true));
-        }
-        
-        // Call the service
-        Object responseObj = taxiiClient.callTaxiiService(new URI(cmd.getOptionValue("u")), request);
 
-        System.out.println(taxiiXml.marshalToString(responseObj, true));        
+        doCall(cmd, request);
     }    
 }

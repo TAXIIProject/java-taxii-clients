@@ -2,7 +2,6 @@ package org.mitre.taxii.client.example;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import javax.xml.bind.JAXBException;
 import org.apache.commons.cli.CommandLine;
@@ -43,15 +42,8 @@ public class CollectionInformationClient extends AbstractClient {
         // Prepare the message to send.
         CollectionInformationRequest request = factory.createCollectionInformationRequest()
                 .withMessageId(MessageHelper.generateMessageId());
-
-        if (cmd.hasOption("verbose")) {
-            System.out.println(taxiiXml.marshalToString(request, true));
-        }
         
-        // Call the service
-        Object responseObj = taxiiClient.callTaxiiService(new URI(cmd.getOptionValue("u")), request);
-
-        System.out.println(taxiiXml.marshalToString(responseObj, true));        
+        doCall(cmd, request);
     }    
     
 }

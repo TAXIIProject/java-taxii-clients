@@ -49,10 +49,6 @@ public class DiscoveryClient10 extends AbstractClient {
         // Prepare the message to send.
         DiscoveryRequest request = factory10.createDiscoveryRequest()
                 .withMessageId(String.valueOf(id));
-
-        if (cmd.hasOption("verbose")) {
-            System.out.println(taxiiXml.marshalToString(request, true));
-        }
         
         // Call the service
         Object responseObj = taxiiClient.callTaxiiService(new URI(cmd.getOptionValue("u")), request);

@@ -1,7 +1,11 @@
 package org.mitre.taxii.client.example;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import javax.xml.bind.JAXBException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -12,6 +16,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.mitre.taxii.client.HttpClient;
 import org.mitre.taxii.messages.TaxiiXml;
 import org.mitre.taxii.messages.xml11.ObjectFactory;
+import org.mitre.taxii.messages.xml11.PythonTextOutput;
 import org.mitre.taxii.messages.xml11.TaxiiXmlFactory;
 
 /**
@@ -92,4 +97,26 @@ abstract class AbstractClient {
         client.setHttpclient(builder.build());
         return client;
     }    
+    
+    Object doCall(CommandLine cmd, Object request) throws JAXBException, IOException, URISyntaxException{
+        
+            System.out.println("Request:");
+            if (cmd.hasOption("xmloutput")) {
+                System.out.println(taxiiXml.marshalToString(request, true));
+            } else {
+                System.out.println(PythonTextOutput.toText(request));
+            }
+        
+        // Call the service
+        Object responseObj = taxiiClient.callTaxiiService(new URI(cmd.getOptionValue("u")), request);
+
+        System.out.println("Response:");        
+        if (cmd.hasOption("xmloutput")) {
+            System.out.println(taxiiXml.marshalToString(responseObj, true));
+        } else {
+            System.out.println(PythonTextOutput.toText(responseObj));
+        }
+        
+        return responseObj;
+    }
 }

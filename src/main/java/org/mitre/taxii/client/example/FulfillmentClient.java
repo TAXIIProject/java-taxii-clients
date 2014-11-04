@@ -56,13 +56,7 @@ public class FulfillmentClient extends AbstractClient {
                 .withResultId(cmd.getOptionValue("result_id"))
                 .withResultPartNumber(BigInteger.valueOf(part));                                
 
-        if (cmd.hasOption("verbose")) {
-            System.out.println(taxiiXml.marshalToString(request, true));
-        }
+        doCall(cmd, request);
         
-        // Call the service
-        Object responseObj = taxiiClient.callTaxiiService(new URI(cmd.getOptionValue("u")), request);
-
-        System.out.println(taxiiXml.marshalToString(responseObj, true));        
     }    
 }
