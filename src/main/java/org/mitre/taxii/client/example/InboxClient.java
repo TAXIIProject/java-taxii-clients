@@ -38,6 +38,7 @@ public class InboxClient extends AbstractClient {
     
     public InboxClient() {
         super();
+        defaultURL += "inbox/";
     }
     
     private void processArgs(String[] args) throws MalformedURLException, JAXBException, IOException, URISyntaxException, Exception {

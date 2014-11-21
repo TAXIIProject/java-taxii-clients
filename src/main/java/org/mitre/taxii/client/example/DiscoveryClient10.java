@@ -27,6 +27,7 @@ public class DiscoveryClient10 extends AbstractClient {
     
     public DiscoveryClient10() {
         super();
+        defaultURL += "discovery/";
     }
     
     private void processArgs(String[] args) throws MalformedURLException, JAXBException, IOException, URISyntaxException, Exception {

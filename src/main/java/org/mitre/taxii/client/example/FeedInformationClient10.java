@@ -27,6 +27,7 @@ public class FeedInformationClient10 extends AbstractClient {
     
     public FeedInformationClient10() {
         super();
+        defaultURL += "feed-management/";
     }
     
     private void processArgs(String[] args) throws MalformedURLException, JAXBException, IOException, URISyntaxException, Exception {

@@ -28,6 +28,7 @@ public class FulfillmentClient extends AbstractClient {
     
     public FulfillmentClient() {
         super();
+        defaultURL += "poll/";
     }
     
     private void processArgs(String[] args) throws MalformedURLException, JAXBException, IOException, URISyntaxException, Exception {

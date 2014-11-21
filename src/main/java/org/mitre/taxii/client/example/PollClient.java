@@ -44,6 +44,7 @@ public class PollClient extends AbstractClient {
     
     public PollClient() {
         super();
+        defaultURL += "poll/";
     }
     
     private void processArgs(String[] args) throws MalformedURLException, JAXBException, IOException, URISyntaxException, Exception {
@@ -60,11 +61,11 @@ public class PollClient extends AbstractClient {
         CommandLine cmd = cli.getCmd();
         
         // Handle default values.
-        String collection = cmd.hasOption("collection") ? cmd.getOptionValue("collection") : "default";
-        String beginStr = cmd.hasOption("begin_timestamp") ? cmd.getOptionValue("begin_timestamp") : null;
-        String endStr = cmd.hasOption("end_timestamp") ? cmd.getOptionValue("end_timestamp") : null;
-        String subId = cmd.hasOption("subscription_id") ? cmd.getOptionValue("subscription_id") : null;
-        String dest = cmd.hasOption("dest_dir") ? cmd.getOptionValue("dest_dir") : ".";
+        String collection = cmd.getOptionValue("collection", "default");
+        String beginStr = cmd.getOptionValue("begin_timestamp", null);
+        String endStr = cmd.getOptionValue("end_timestamp", null);
+        String subId = cmd.getOptionValue("subscription_id", null);
+        String dest = cmd.getOptionValue("dest_dir", ".");
         
 
         taxiiClient = generateClient(cmd);

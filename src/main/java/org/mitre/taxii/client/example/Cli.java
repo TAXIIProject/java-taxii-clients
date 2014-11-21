@@ -26,9 +26,7 @@ public class Cli {
         // Options common to all client apps.
         options.addOption("h", "help", false, "show help.");
 //        options.addOption("v", "verbose", false, "Turn on verbose mode.");
-        Option urlOption = new Option("u", "url", true, "REQUIRED. The URL of the TAXII service provider to connect to. (e.g. http://taxiitest.mitre.org:80/services/discovery/");
-        urlOption.setRequired(true);
-        options.addOption(urlOption);
+        Option urlOption = new Option("u", "url", true, "The URL of the TAXII service provider to connect to. (e.g. http://taxiitest.mitre.org:80/services/discovery/). If not provided, a default value connecting to http://taxiitest.mitre.org will be used.");
         
 // TODO: Certificates and Key files is a rather rich and complicated subject. 
 // The python library supports a very specific implementation. Eventually support whatever the Python library supports.        

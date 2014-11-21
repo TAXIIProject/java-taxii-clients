@@ -26,11 +26,12 @@ import org.mitre.taxii.messages.xml11.TaxiiXmlFactory;
  * @author jasenj1
  */
 abstract class AbstractClient {
-    final Cli cli;
+    final Cli cli;    
     ObjectFactory factory = new ObjectFactory();
     TaxiiXmlFactory txf = new TaxiiXmlFactory();
     TaxiiXml taxiiXml;
     HttpClient taxiiClient;
+    String defaultURL = "http://taxiitest.mitre.org/services/"; // If the "u" command line parameter is not provided, use this value.
           
     AbstractClient() {
         this.cli = new Cli();
@@ -108,7 +109,7 @@ abstract class AbstractClient {
             }
         
         // Call the service
-        Object responseObj = taxiiClient.callTaxiiService(new URI(cmd.getOptionValue("u")), request);
+        Object responseObj = taxiiClient.callTaxiiService(new URI(cmd.getOptionValue("u", defaultURL)), request);
 
         System.out.println("Response:");        
         if (cmd.hasOption("xmloutput")) {

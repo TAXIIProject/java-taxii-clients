@@ -13,6 +13,7 @@ import org.mitre.taxii.messages.xml11.MessageHelper;
  * @author jasenj1
  */
 public class CollectionInformationClient extends AbstractClient {
+
     /**
      * @param args the command line arguments
      */
@@ -28,6 +29,7 @@ public class CollectionInformationClient extends AbstractClient {
     
     public CollectionInformationClient() {
         super();
+        defaultURL += "collection-management/";
     }
     
     private void processArgs(String[] args) throws MalformedURLException, JAXBException, IOException, URISyntaxException, Exception {
@@ -36,7 +38,7 @@ public class CollectionInformationClient extends AbstractClient {
         
         cli.parse(args);
         CommandLine cmd = cli.getCmd();
-
+        
         taxiiClient = generateClient(cmd);
         
         // Prepare the message to send.
