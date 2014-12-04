@@ -44,7 +44,13 @@ public class Cli {
             this.cmd = parser.parse(options, args);
         } catch (ParseException pe) {
             help();
-        }        
+        }
+        
+        // Display help and exit.
+        if (cmd.hasOption("help")) {
+            help();
+            System.exit(0);
+        }
     }
     
     private void help() {
