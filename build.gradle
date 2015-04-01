@@ -36,7 +36,7 @@ dependencies {
     compile 'org.apache.httpcomponents:httpclient-cache:4.3.5'
     compile 'org.apache.httpcomponents:httpmime:4.3.5'
     compile 'org.apache.httpcomponents:fluent-hc:4.3.5'    
-    compile files('lib/java-taxii-1.1.jar')
+    compile files('../java-taxii/build/libs/java-taxii-1.1.jar')
 }
 
 task allJar(type: Jar) {
