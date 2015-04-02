@@ -17,8 +17,8 @@ public class FeedInformationClient10 extends AbstractClient {
      */
     public static void main(String[] args) {
         try {
-        FeedInformationClient10 client = new FeedInformationClient10();
-        client.processArgs(args);
+            FeedInformationClient10 client = new FeedInformationClient10();
+            client.processArgs(args);
         } catch (Throwable t) {
             System.out.println(t.getMessage());
             System.exit(1);
@@ -50,18 +50,22 @@ public class FeedInformationClient10 extends AbstractClient {
         // Prepare the message to send.
         FeedInformationRequest request = factory10.createFeedInformationRequest()
                 .withMessageId(String.valueOf(id));
-        
-        if (cmd.hasOption("verbose")) {
-            System.out.println(taxiiXml.marshalToString(request, true));
-        }
 
-        if (cmd.hasOption("verbose")) {
+        if (cmd.hasOption("xmloutput")) {
+            System.out.println("Request:");
             System.out.println(taxiiXml.marshalToString(request, true));
-        }
+        } // else {
+//            System.out.println(PythonTextOutput.toText(request));
+//        }
         
         // Call the service
         Object responseObj = taxiiClient.callTaxiiService(new URI(cmd.getOptionValue("u")), request);
 
-        System.out.println(taxiiXml.marshalToString(responseObj, true));        
+        if (cmd.hasOption("xmloutput")) {
+            System.out.println("Response:");        
+            System.out.println(taxiiXml.marshalToString(responseObj, true));
+        } //else {
+//            System.out.println(PythonTextOutput.toText(responseObj));
+//        }
     }    
 }
