@@ -1,5 +1,9 @@
 package org.mitre.taxii.client.example;
 
+import gov.anl.cfm.logging.CFMLogFields;
+import gov.anl.cfm.logging.CFMLogFields.Environment;
+import gov.anl.cfm.logging.CFMLogFields.State;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -47,7 +51,7 @@ import org.w3c.dom.ls.LSSerializer;
 
 public class PollClient extends AbstractClient {
 	private static final SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
+	private static CFMLogFields logger;
 
     /**
      * @param args the command line arguments
@@ -77,6 +81,13 @@ public class PollClient extends AbstractClient {
         options.addOption("subscription_id", true, "The Subscription ID for the poll request. Defaults to none.");
         options.addOption("dest_dir", true, "The directory to save Content Blocks to. Defaults to the current directory.");
 
+        // add options for logging
+        options.addOption("proc_name", true, "process name");
+        options.addOption("subproc", true, "subprocess name");
+        options.addOption("env", true, "environment enumeration");
+        options.addOption("session_id", true, "session ID from calling script");
+        
+        
         cli.parse(args);
         CommandLine cmd = cli.getCmd();
         
@@ -86,6 +97,13 @@ public class PollClient extends AbstractClient {
         String endStr = cmd.getOptionValue("end_timestamp", null);
         String subId = cmd.getOptionValue("subscription_id", null);
         String dest = cmd.getOptionValue("dest_dir", ".");
+        
+        String procName = cmd.getOptionValue("proc_name","TaxiiClient");
+        String subProc = cmd.getOptionValue("subproc","Poll");
+        Environment env = Environment.valueOf(cmd.getOptionValue("env","Other"));
+        String sessionID = cmd.getOptionValue("session_id","-1");
+        
+        logger = new CFMLogFields(procName, sessionID, env, State.PROCESSING);
         
 		Date lastTime = getLatestTime(dest);
 		Date now = new Date();
