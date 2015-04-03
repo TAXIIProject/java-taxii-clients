@@ -36,7 +36,11 @@ dependencies {
     compile 'org.apache.httpcomponents:httpclient-cache:4.3.5'
     compile 'org.apache.httpcomponents:httpmime:4.3.5'
     compile 'org.apache.httpcomponents:fluent-hc:4.3.5'    
-    compile files('../java-taxii/build/libs/java-taxii-1.1.jar')
+	
+	compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.2'
+	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.2'
+  
+    compile files('../java-taxii/build/libs/java-taxii-1.1.jar' '../java-stix-validator/build/libs/STIX_Validator-1.0.jar')
 }
 
 task allJar(type: Jar) {
