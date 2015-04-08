@@ -24,8 +24,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -38,6 +36,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mitre.taxii.ContentBindings;
 import org.mitre.taxii.messages.xml11.ContentBlock;
 import org.mitre.taxii.messages.xml11.MessageHelper;
@@ -52,6 +52,7 @@ import org.w3c.dom.ls.LSSerializer;
 public class PollClient extends AbstractClient {
 	private static final SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private static CFMLogFields logger;
+	private static Logger plog;
 
     /**
      * @param args the command line arguments
@@ -69,6 +70,7 @@ public class PollClient extends AbstractClient {
     public PollClient() {
         super();
         defaultURL += "poll/";
+        plog = LogManager.getLogger(PollClient.class.getName());
     }
 
     private void processArgs(String[] args) throws MalformedURLException, JAXBException, IOException, URISyntaxException, Exception {
@@ -85,7 +87,6 @@ public class PollClient extends AbstractClient {
         options.addOption("proc_name", true, "process name");
         options.addOption("subproc", true, "subprocess name");
         options.addOption("env", true, "environment enumeration");
-        options.addOption("session_id", true, "session ID from calling script");
         
         
         cli.parse(args);
@@ -98,12 +99,14 @@ public class PollClient extends AbstractClient {
         String subId = cmd.getOptionValue("subscription_id", null);
         String dest = cmd.getOptionValue("dest_dir", ".");
         
-        String procName = cmd.getOptionValue("proc_name","TaxiiClient");
+        String procName = cmd.getOptionValue("proc_name","TaxiiClientBA");
         String subProc = cmd.getOptionValue("subproc","Poll");
         Environment env = Environment.valueOf(cmd.getOptionValue("env","Other"));
-        String sessionID = cmd.getOptionValue("session_id","-1");
+        // use built-in UUID generator for the session ID
+        String sessionID = MessageHelper.generateMessageId();
         
-        logger = new CFMLogFields(procName, sessionID, env, State.PROCESSING);
+        CFMLogFields.setBaseProcName(procName);
+        logger = new CFMLogFields(subProc, sessionID, env, State.PROCESSING);
         
 		Date lastTime = getLatestTime(dest);
 		Date now = new Date();
@@ -113,7 +116,7 @@ public class PollClient extends AbstractClient {
 
         // Prepare the message to send.
         PollRequest request = factory.createPollRequest()
-                .withMessageId(MessageHelper.generateMessageId())
+                .withMessageId(sessionID)
                 .withCollectionName(collection);
 
         if (null != subId) {
@@ -137,19 +140,19 @@ public class PollClient extends AbstractClient {
     	gc.setTime(lastTime);
     	XMLGregorianCalendar beginTime = DatatypeFactory.newInstance().newXMLGregorianCalendar((GregorianCalendar)gc).normalize();
     	beginTime.setFractionalSecond(null);
-    	Logger.getLogger(PollClient.class.getName()).log(Level.INFO,"Begin Time: "+beginTime);
+    	logger.info(plog, "Begin Time: {}", beginTime);
         request.setExclusiveBeginTimestamp(beginTime);
 
     	
     	gc.setTime(now);
     	XMLGregorianCalendar endTime = DatatypeFactory.newInstance().newXMLGregorianCalendar((GregorianCalendar)gc).normalize();
     	endTime.setFractionalSecond(null);
-    	Logger.getLogger(PollClient.class.getName()).log(Level.INFO,"End Time: "+endTime);
+    	logger.info(plog,"End Time: {}",endTime);
         request.setInclusiveEndTimestamp(endTime);
 
 
 
-        Object response = doCall(cmd, request);
+        Object response = doCall(cmd, request, logger);
 
         if (response instanceof PollResponse) {
         	// do I want to still do this for our use?  KLS
@@ -170,9 +173,9 @@ public class PollClient extends AbstractClient {
     private void handleResponse(String dest, PollResponse response) {
         try {
             if (response.isMore()) {
-                System.out.println("This response has More=True, to request additional parts, use the following command:");
-                System.out.println(String.format("  fulfillment_client --collection %s --result_id %s --result_part_number %s\r\n",
-                        response.getCollectionName(), response.getResultId(), response.getResultPartNumber().add(BigInteger.ONE)));
+                logger.info(plog,"This response has More=True, to request additional parts, use the following command:");
+                logger.info(plog,"  fulfillment_client --collection {} --result_id {} --result_part_number {}\r\n",
+                        response.getCollectionName(), response.getResultId(), response.getResultPartNumber().add(BigInteger.ONE));
             }
             // Build the filename for the output
             String dateString;
@@ -272,31 +275,31 @@ public class PollClient extends AbstractClient {
 	                        }
 	                        fileWriter.flush();
 	                        fileWriter.close();
-	                        System.out.println(String.format("Wrote Content to %s", filepath));;
+	                    	logger.updateState(State.SUCCESS);
+	                        System.out.println(String.format("Wrote Content to %s", filepath));
+	                        logger.info(plog, "Wrote Content to {}", filepath);
 	                    } // If Content element found.
-	                } catch (UnsupportedEncodingException ex) {
-	                    Logger.getLogger(PollClient.class.getName()).log(Level.SEVERE, null, ex);
-	                } catch (JAXBException ex) {
-	                    Logger.getLogger(PollClient.class.getName()).log(Level.SEVERE, null, ex);
-	                } catch (FileNotFoundException ex) {
-	                    Logger.getLogger(PollClient.class.getName()).log(Level.SEVERE, null, ex);
-	                } catch (IOException ex) {
-	                    Logger.getLogger(PollClient.class.getName()).log(Level.SEVERE, null, ex);
+	                } catch (JAXBException|IOException ex) {
+	                	logger.updateState(State.ERROR);
+	                    logger.error(plog, null, ex);
 	                } finally {
 	                    if (null != fileWriter) {
 	                        try {
 	                            fileWriter.close();
 	                        } catch (IOException ex) {
-	                            Logger.getLogger(PollClient.class.getName()).log(Level.SEVERE, null, ex);
+	    	                	logger.updateState(State.ERROR);
+	    	                    logger.error(plog, null, ex);
 	                        }
 	                    }
 	                }
 	            }// for each ContentBlock
             } else {
-	            Logger.getLogger(PollClient.class.getName()).log(Level.WARNING,"There were no Content Blocks returned");
+            	logger.updateState(State.FAILURE);
+	            logger.warn(plog,"There were no Content Blocks returned");
 	        }
         } catch (ParserConfigurationException ex) {
-            Logger.getLogger(PollClient.class.getName()).log(Level.SEVERE, null, ex);
+        	logger.updateState(State.ERROR);
+            logger.error(plog, null, ex);
         }
     }// handleResponse()
     
@@ -325,18 +328,17 @@ public class PollClient extends AbstractClient {
 			}
 			
 		} catch (ParseException e) {
-			Logger.getLogger(PollClient.class.getName()).log(Level.SEVERE,"couldn't parse date, using current time", e);
+			logger.error(plog,"couldn't parse date, using current time", e);
 		} catch (FileNotFoundException e) {
-			Logger.getLogger(PollClient.class.getName()).log(Level.SEVERE,"File doesn't exist, using current time", e);
+			logger.error(plog,"File doesn't exist, using current time", e);
 		} catch (IOException e) {
-			Logger.getLogger(PollClient.class.getName()).log(Level.SEVERE,"couldn't read lasttime file, using current time", e);
+			logger.error(plog,"couldn't read lasttime file, using current time", e);
 		} finally {
 			if (rd != null)
 				try {
 					rd.close();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+                    logger.error(plog, null, e);
 				}
 		}
 		
@@ -348,8 +350,7 @@ public class PollClient extends AbstractClient {
 			fw.write(fmt.format(new Date()));
 			fw.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+            logger.error(plog, null, e);
 		}
 
 		return lastTime;

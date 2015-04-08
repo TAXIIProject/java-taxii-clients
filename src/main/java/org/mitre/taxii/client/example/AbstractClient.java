@@ -1,5 +1,7 @@
 package org.mitre.taxii.client.example;
 
+import gov.anl.cfm.logging.CFMLogFields;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -9,18 +11,11 @@ import java.net.URL;
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpRequestInterceptor;
-import org.apache.http.auth.AuthScheme;
 import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.AuthState;
-import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
 import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
@@ -35,9 +30,7 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.protocol.BasicHttpContext;
-import org.apache.http.protocol.ExecutionContext;
-import org.apache.http.protocol.HttpContext;
+import org.apache.logging.log4j.LogManager;
 import org.mitre.taxii.client.HttpClient;
 import org.mitre.taxii.messages.TaxiiXml;
 import org.mitre.taxii.messages.xml11.ObjectFactory;
@@ -162,24 +155,27 @@ abstract class AbstractClient {
         return client;
     }    
     
-    Object doCall(CommandLine cmd, Object request) throws JAXBException, IOException, URISyntaxException{
-        
-            System.out.println("Request:");
+    Object doCall(CommandLine cmd, Object request, CFMLogFields logger) throws JAXBException, IOException, URISyntaxException{
+        	String req = null;
             if (cmd.hasOption("xmloutput")) {
-                System.out.println(taxiiXml.marshalToString(request, true));
+                req = taxiiXml.marshalToString(request, true);
             } else {
-                System.out.println(PythonTextOutput.toText(request));
+                req = PythonTextOutput.toText(request);
             }
+            logger.debug(LogManager.getLogger(AbstractClient.class.getName()), "Request: \n{}", req);
+
         
         // Call the service
         Object responseObj = taxiiClient.callTaxiiService(new URI(cmd.getOptionValue("u", defaultURL)), request, context);
 
-        System.out.println("Response:");        
+        String resp = null;
         if (cmd.hasOption("xmloutput")) {
-            System.out.println(taxiiXml.marshalToString(responseObj, true));
+            resp = taxiiXml.marshalToString(responseObj, true);
         } else {
-            System.out.println(PythonTextOutput.toText(responseObj));
+            resp = PythonTextOutput.toText(responseObj);
         }
+        logger.debug(LogManager.getLogger(AbstractClient.class.getName()), "Response: \n{}", resp);
+
         
         return responseObj;
     }

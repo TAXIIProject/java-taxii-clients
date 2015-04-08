@@ -1,17 +1,25 @@
 package org.mitre.taxii.client.example;
 
+import gov.anl.cfm.logging.CFMLogFields;
+import gov.anl.cfm.logging.CFMLogFields.Environment;
+import gov.anl.cfm.logging.CFMLogFields.State;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mitre.taxii.messages.xml11.ContentBlock;
 import org.mitre.taxii.messages.xml11.ContentInstanceType;
 import org.mitre.taxii.messages.xml11.InboxMessage;
@@ -23,7 +31,9 @@ import org.xml.sax.InputSource;
 public class InboxClient extends AbstractClient {
     
     private static final String CB_STIX_XML_111 = "urn:stix.mitre.org:xml:1.1.1";
-    /**
+	private static CFMLogFields logger;
+
+	/**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
@@ -67,12 +77,21 @@ public class InboxClient extends AbstractClient {
         if (!contentFile.canRead()) {
             throw new IOException("Unable to read content file.");
         }
-                
+           
+        String procName = cmd.getOptionValue("proc_name","TaxiiClientBA");
+        String subProc = cmd.getOptionValue("subproc","Inbox");
+        Environment env = Environment.valueOf(cmd.getOptionValue("env","Other"));
+        // use built-in UUID generator for the session ID
+        String sessionID = MessageHelper.generateMessageId();
+        
+        CFMLogFields.setBaseProcName(procName);
+        logger = new CFMLogFields(subProc, sessionID, env, State.PROCESSING);
+
         taxiiClient = generateClient(cmd);
         
         // Prepare the message to send.
         InboxMessage request = factory.createInboxMessage()
-                .withMessageId(MessageHelper.generateMessageId());
+                .withMessageId(sessionID);
         
         if (null != dcn) {
             request.withDestinationCollectionNames(dcn);
@@ -100,6 +119,6 @@ public class InboxClient extends AbstractClient {
         
         request.withContentBlocks(cb);
 
-        doCall(cmd, request);
+        doCall(cmd, request, logger);
     }    
 }

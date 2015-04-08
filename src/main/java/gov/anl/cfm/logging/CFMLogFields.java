@@ -118,6 +118,10 @@ public class CFMLogFields {
 		ERROR,
 		END
 	}
+	private static String baseProcName = null;
+	public static void setBaseProcName(String baseName) {
+		baseProcName = baseName;
+	}
 	private static final String LEVEL_KEY = "level";
 	private static final String TEXT_KEY = "text";
 
@@ -133,17 +137,29 @@ public class CFMLogFields {
 	private static final String STATE_KEY = "state";
 	private State state;
 	
+	//option common keys
+	private static final String SITE_KEY = "site";
+	private String site;
+	private static final String SITE_IP_KEY = "siteIP";
+	private String siteIP;
+	private static final String SITE_USER_KEY = "siteUser";
+	private String siteUser;
+	private static final String PAYLOAD_TYPE_KEY = "payloadType";
+	private String payloadType;
+	private static final String PAYLOAD_FORMAT_KEY = "payloadFormat";
+	private String payloadFormat;
+	
 	private Map<String,String> otherKeys;
 	
 	public CFMLogFields(String procName, String sessionId, State state) {
-		this.processName = procName;
+		this.processName = initProcName(procName);
 		this.sessionId = sessionId;
 		this.env = Environment.valueOf(System.getProperty("anl.cfm.server.environment","Other"));
 		this.state = state;
 		otherKeys = new HashMap<>();
 	}
 	public CFMLogFields(String procName, String sessionId, Environment env, State state) {
-		this.processName = procName;
+		this.processName = initProcName(procName);
 		this.sessionId = sessionId;
 		this.env = env;
 		this.state = state;
@@ -155,10 +171,71 @@ public class CFMLogFields {
 	 * @param fields
 	 */
 	public CFMLogFields(String procName, CFMLogFields fields) {
-		this.processName = procName;
+		this.processName = initProcName(procName);
 		this.sessionId = fields.sessionId;
 		this.env = fields.env;
 		this.state = fields.state;
+		this.site = fields.site;
+		this.siteIP = fields.siteIP;
+		this.siteUser = fields.siteUser;
+		this.payloadType = fields.payloadType;
+		this.payloadFormat = fields.payloadFormat;
+	}
+	private String initProcName(String procName) {
+		if (baseProcName != null) {
+			//if the baseProcName is set, pre-pend to the given process name
+			return baseProcName+"-"+procName;
+		}
+		return procName;
+	}
+
+	public String getSite() {
+		return site;
+	}
+
+
+	public void setSite(String site) {
+		this.site = site;
+	}
+
+
+	public String getSiteIP() {
+		return siteIP;
+	}
+
+
+	public void setSiteIP(String siteIP) {
+		this.siteIP = siteIP;
+	}
+
+
+	public String getSiteUser() {
+		return siteUser;
+	}
+
+
+	public void setSiteUser(String siteUser) {
+		this.siteUser = siteUser;
+	}
+
+
+	public String getPayloadType() {
+		return payloadType;
+	}
+
+
+	public void setPayloadType(String payloadType) {
+		this.payloadType = payloadType;
+	}
+
+
+	public String getPayloadFormat() {
+		return payloadFormat;
+	}
+
+
+	public void setPayloadFormat(String payloadFormat) {
+		this.payloadFormat = payloadFormat;
 	}
 
 
@@ -199,6 +276,23 @@ public class CFMLogFields {
 		map.put(ENV_KEY,env.getLabel());
 		map.put(STATE_KEY,state.name());
 		
+		//optional common keys
+		if (site != null) {
+			map.put(SITE_KEY,site);
+		}
+		if (siteIP != null) {
+			map.put(SITE_IP_KEY,siteIP);
+		}
+		if (siteUser != null) {
+			map.put(SITE_USER_KEY,siteUser);
+		}
+		if (payloadType != null) {
+			map.put(PAYLOAD_TYPE_KEY,payloadType);
+		}
+		if (payloadFormat != null) {
+			map.put(PAYLOAD_FORMAT_KEY,payloadFormat);
+		}
+
 		if (!otherKeys.isEmpty()) {
 			map.putAll(otherKeys);
 		}
