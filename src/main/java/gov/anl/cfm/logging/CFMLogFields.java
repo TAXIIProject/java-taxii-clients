@@ -163,7 +163,7 @@ public class CFMLogFields {
 		this.sessionId = sessionId;
 		this.env = env;
 		this.state = state;
-		otherKeys = new HashMap();
+		otherKeys = new HashMap<>();
 	}
 	/**
 	 * Creates a new instance with the given process name and all other values initialized from the reference item

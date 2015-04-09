@@ -13,7 +13,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
@@ -25,6 +24,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -33,17 +33,20 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.dom.DOMResult;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mitre.stix.stix_1.STIXPackage;
 import org.mitre.taxii.ContentBindings;
 import org.mitre.taxii.messages.xml11.ContentBlock;
 import org.mitre.taxii.messages.xml11.MessageHelper;
 import org.mitre.taxii.messages.xml11.PollRequest;
 import org.mitre.taxii.messages.xml11.PollResponse;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.ls.DOMImplementationLS;
@@ -52,7 +55,8 @@ import org.w3c.dom.ls.LSSerializer;
 public class PollClient extends AbstractClient {
 	private static final SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private static CFMLogFields logger;
-	private static Logger plog;
+	private static Logger plog = LogManager.getLogger(PollClient.class.getName());
+
 
     /**
      * @param args the command line arguments
@@ -62,7 +66,7 @@ public class PollClient extends AbstractClient {
             PollClient client = new PollClient();
             client.processArgs(args);
         } catch (Throwable t) {
-            System.out.println(t.getMessage());
+            plog.fatal(t.getMessage());
             System.exit(1);
         }
     }
@@ -70,7 +74,6 @@ public class PollClient extends AbstractClient {
     public PollClient() {
         super();
         defaultURL += "poll/";
-        plog = LogManager.getLogger(PollClient.class.getName());
     }
 
     private void processArgs(String[] args) throws MalformedURLException, JAXBException, IOException, URISyntaxException, Exception {
@@ -185,12 +188,13 @@ public class PollClient extends AbstractClient {
             
             List<ContentBlock> blocks =  response.getContentBlocks();
             if (blocks.size() > 0) {
-            
+           
 	            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 	            dbf.setNamespaceAware(true);
 	            DocumentBuilder db = dbf.newDocumentBuilder();
 	            
 	            for (ContentBlock cb : blocks) {
+
 	                // Build the filename for the output.
 	                try {
 	                    String binding = cb.getContentBinding().getBindingId();
@@ -237,7 +241,9 @@ public class PollClient extends AbstractClient {
 	                    the closest root element and then dig down to get to what we
 	                    really want to marshal.
 	                    */
+	                    
 	                    Marshaller m = taxiiXml.createMarshaller(true);
+	                    
 	                    Document doc = db.newDocument();
 	                    m.marshal(cb, doc);
 	                    m.marshal(cb,System.out);
@@ -245,11 +251,16 @@ public class PollClient extends AbstractClient {
 	                    /* NOTE: It is bad practice to rely on the namespace prefix being a certain value.
 	                    But in this case, the JAXB binding configuration dictates what it will be.
 	                    */
-	                    NodeList contents = doc.getElementsByTagName("Content");
+	                    // KLS - the getElementByTagName DOES NOT WORK. 4/2015
+	                   // NodeList contents = doc.getElementsByTagNameNS("*","Content");
+	                    //NodeList contents = root.getChildNodes();
+	                    Element root = doc.getDocumentElement();
+	                    Node contentNode = root.getFirstChild().getNextSibling();
 	                    
 	                    /* According to the schema there must be exactly 1 Content element, but make sure we got one. */
-	                    if (0 < contents.getLength()) {
-	                        Node contentNode = contents.item(0);
+	                    //if (0 < contents.getLength()) {
+	                        //contentNode = contents.item(0);
+	                    if (contentNode != null) {
 	                        /*
 	                        Content contains AnyMixedContentType. It is not necessarily a single element.
 	                        And may be text & XML elements mixed together.
@@ -270,13 +281,18 @@ public class PollClient extends AbstractClient {
 	                            // Write current child to a string.
 	                            String childStr = serializer.writeToString(child);
 	                            
+	                            // validate the STIX here
+	                            JAXBContext stixContext = JAXBContext.newInstance(STIXPackage.class.getPackage().getName());
+	                            STIXPackage sp = STIXPackage.fromXMLString(childStr);
+	                            
 	                            // Append child string to output file.
 	                            fileWriter.append(childStr);
 	                        }
 	                        fileWriter.flush();
 	                        fileWriter.close();
 	                    	logger.updateState(State.SUCCESS);
-	                        System.out.println(String.format("Wrote Content to %s", filepath));
+	            			// write filepath to stdout for FX, not the logger
+	                        System.out.println(outFile.getCanonicalPath());
 	                        logger.info(plog, "Wrote Content to {}", filepath);
 	                    } // If Content element found.
 	                } catch (JAXBException|IOException ex) {

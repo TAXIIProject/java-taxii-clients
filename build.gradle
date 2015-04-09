@@ -1,4 +1,5 @@
 apply plugin: 'java'
+apply plugin: 'eclipse'
 
 sourceCompatibility = '1.8'
 
@@ -19,7 +20,14 @@ repositories {
     mavenCentral()
     // You may define additional repositories, or even remove "mavenCentral()".
     // Read more about repositories here:
-    //   http://www.gradle.org/docs/current/userguide/dependency_management.html#sec:repositories
+    //   http://www.gradle.org/docs/current/userguide/dependency_management.html#sec:repositorie
+	maven {
+		// mitre need to fix their repository for building, for now, use the snapshot
+		url "https://oss.sonatype.org/content/repositories/snapshots/"
+	}
+	flatDir {
+		dirs '../java-taxii/build/libs'
+	}
 }
 
 dependencies {
@@ -41,6 +49,8 @@ dependencies {
 	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.2'
   
     compile files('../java-taxii/build/libs/java-taxii-1.1.jar','../java-stix-validator/build/libs/STIX_Validator-1.0.jar')
+	// mitre need to fix their repository for building, for now, use the snapshot
+	compile 'org.mitre:stix:1.1.1-SNAPSHOT'
 }
 
 task allJar(type: Jar) {

@@ -1,6 +1,7 @@
 package org.mitre.taxii.client.example;
 
 import gov.anl.cfm.logging.CFMLogFields;
+import gov.anl.cfm.logging.CFMLogFields.State;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -36,6 +37,9 @@ import org.mitre.taxii.messages.TaxiiXml;
 import org.mitre.taxii.messages.xml11.ObjectFactory;
 import org.mitre.taxii.messages.xml11.PythonTextOutput;
 import org.mitre.taxii.messages.xml11.TaxiiXmlFactory;
+import org.mitre.taxii.util.Validation;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 /**
  * Provides a set of common command line handling methods and other things
@@ -155,13 +159,36 @@ abstract class AbstractClient {
         return client;
     }    
     
-    Object doCall(CommandLine cmd, Object request, CFMLogFields logger) throws JAXBException, IOException, URISyntaxException{
+    Object doCall(CommandLine cmd, Object request, CFMLogFields logger) throws JAXBException, IOException, URISyntaxException {
+    	// validate the taxii
+        	Validation results;
+			try {
+				results = taxiiXml.validateFast(request, true);
+	        	if (results.hasWarnings()) {
+	        		logger.error(LogManager.getLogger(AbstractClient.class.getName()), "TAXII Validation Warning: {}", results.getAllWarnings());
+	        	}
+	        	if (results.hasErrors()) {
+	        		logger.updateState(State.ERROR);
+	        		logger.error(LogManager.getLogger(AbstractClient.class.getName()), "TAXII Validation Error: {}", results.getAllErrors());
+	        		return null;
+	        	}
+			} catch (SAXParseException e) {
+        		logger.updateState(State.ERROR);
+        		logger.error(LogManager.getLogger(AbstractClient.class.getName()), "TAXII Validation Error: {}", Validation.formatException(e));
+        		return null;
+	        } catch (SAXException e) {
+        		logger.updateState(State.ERROR);
+        		logger.error(LogManager.getLogger(AbstractClient.class.getName()), "TAXII Validation Error: {}", e);
+        		return null;
+			}
+        	
         	String req = null;
             if (cmd.hasOption("xmloutput")) {
                 req = taxiiXml.marshalToString(request, true);
             } else {
                 req = PythonTextOutput.toText(request);
             }
+            logger.info(LogManager.getLogger(AbstractClient.class.getName()), "TAXII Request passed Validation");
             logger.debug(LogManager.getLogger(AbstractClient.class.getName()), "Request: \n{}", req);
 
         
