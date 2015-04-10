@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 
 import javax.xml.bind.JAXBException;
@@ -24,6 +23,7 @@ import org.mitre.taxii.messages.xml11.ContentBlock;
 import org.mitre.taxii.messages.xml11.ContentInstanceType;
 import org.mitre.taxii.messages.xml11.InboxMessage;
 import org.mitre.taxii.messages.xml11.MessageHelper;
+import org.mitre.taxii.messages.xml11.StatusMessage;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -63,6 +63,11 @@ public class InboxClient extends AbstractClient {
         options.addOption(fileOpt);
         options.addOption("dcn", "destination_collection", true, "The Destination Collection Name for this Inbox Message. Defaults to none. This script only supports one Destination Collection Name");
         
+        // add options for logging
+        options.addOption("proc_name", true, "process name");
+        options.addOption("subproc", true, "subprocess name");
+        options.addOption("env", true, "environment enumeration");
+        
         cli.parse(args);
         CommandLine cmd = cli.getCmd();
 
@@ -86,8 +91,37 @@ public class InboxClient extends AbstractClient {
         
         CFMLogFields.setBaseProcName(procName);
         logger = new CFMLogFields(subProc, sessionID, env, State.PROCESSING);
+    	Logger ilog = LogManager.getLogger(InboxClient.class.getName());
+        
+        // validate the STIX before setting up anything else
+//        String xmlstr = new String(Files.readAllBytes(Paths.get(contentFileName)));
+//        STIXPackage sp = STIXPackage.fromXMLString(xmlstr);
+//        String version = sp.getVersion();
+//        
+//        StixValidator sv = new StixValidator(version);
+//        List<SchemaError> errors = sv.validate(contentFile); // sigh. reads it in again.
+//		if (errors.size() > 0) {
+//			logger.updateState(State.ERROR);
+//			logger.error(ilog,"There are {} errors in file {} ",errors.size(),contentFile);
+//			for (SchemaError error : errors) {
+//				logger.error(ilog,"SchemaError Category: {} - Message: {}",error.getCategory(),error.getMessage());
+//				logger.error(ilog,"SchemaError Line: {} - Col: {}",error.getLine(),error.getColumn());
+//			}
+//			logger.info(ilog,"Message was not published due to STIX {} content validation errors!  Please check content and try again.",version);
+//        	throw new RuntimeException("Schema mismatch");
+//		}
 
         taxiiClient = generateClient(cmd);
+        
+        // Handle the content file.
+        // Make the GIANT assumption that the input file is XML and parse it as such.
+        // If not, and the file is XML, it will get escaped when marshaled. e.g. "<" becomes "&lt;".
+        // Create a DOM Node from an XML string.
+        // JAXB can handle a generic DOM NODE, but a String it will escape and treat as a String - not XML.
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        Document doc = db.parse(new InputSource(new FileReader(contentFile))); // now read in a third time?
+        Node content = doc.getDocumentElement(); 
         
         // Prepare the message to send.
         InboxMessage request = factory.createInboxMessage()
@@ -104,21 +138,22 @@ public class InboxClient extends AbstractClient {
         }
         
         cb.setContentBinding(cit);
-        
-        // Handle the content file.
-        // Make the GIANT assumption that the input file is XML and parse it as such.
-        // If not, and the file is XML, it will get escaped when marshaled. e.g. "<" becomes "&lt;".
-        // Create a DOM Node from an XML string.
-        // JAXB can handle a generic DOM NODE, but a String it will escape and treat as a String - not XML.
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        Document doc = db.parse(new InputSource(new FileReader(contentFile)));
-        Node content = doc.getDocumentElement();        
-        
         cb.setContent(factory.createAnyMixedContentType().withContent(content));
         
         request.withContentBlocks(cb);
 
-        doCall(cmd, request, logger);
+        Object response = doCall(cmd, request, logger);
+
+        if (response instanceof StatusMessage) {
+        	logger.debug(ilog, "response: {}", response.toString());
+        	StatusMessage msg = (StatusMessage)response;
+        	if (msg.getStatusType().equals("SUCCESS")) {
+        		logger.info(ilog, "{} uploaded successfully", contentFileName);
+        		logger.info(ilog, "{} ", msg.getMessage());
+        	} else {
+        		logger.updateState(State.FAILURE);
+        		logger.error(ilog, "Status: {}", msg.getMessage());
+        	}
+        }
     }    
 }
