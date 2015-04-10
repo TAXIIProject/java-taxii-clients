@@ -17,7 +17,7 @@
     	</PatternLayout>
     	<Policies>
     		<!--<TimeBasedTriggeringPolicy />   now support time based rolling but I don't think it will auto delete older date files, only deletes based on the max # files which is within a date-->
-    		<SizeBasedTriggeringPolicy size="100 MB" fileIndex="min"/>
+    		<SizeBasedTriggeringPolicy size="100 MB" />
     	</Policies>
     	<DefaultRolloverStrategy max="10" />
     </RollingFile>    <Console name="Console" target="SYSTEM_OUT">
