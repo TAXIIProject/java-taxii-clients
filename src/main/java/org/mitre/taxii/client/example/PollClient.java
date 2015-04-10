@@ -24,7 +24,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -33,13 +32,11 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.dom.DOMResult;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mitre.stix.stix_1.STIXPackage;
 import org.mitre.taxii.ContentBindings;
 import org.mitre.taxii.messages.xml11.ContentBlock;
 import org.mitre.taxii.messages.xml11.MessageHelper;
@@ -158,18 +155,7 @@ public class PollClient extends AbstractClient {
         Object response = doCall(cmd, request, logger);
 
         if (response instanceof PollResponse) {
-        	// do I want to still do this for our use?  KLS
             handleResponse(dest, (PollResponse) response);
-            
-			// write out the returned results as a string. - this is for the FX translator
-//			File output = new File(dest + "/" + now.getTime() + "_" + "PollResults.xml");
-//			FileWriter fw = new FileWriter(output);
-//			fw.write(response.toString());
-//			fw.close();
-//			
-//			// write filepath to stdout, not the logger
-//			System.out.println(output.getCanonicalPath());
-
         }
     }
 
@@ -280,10 +266,6 @@ public class PollClient extends AbstractClient {
 	                                                        
 	                            // Write current child to a string.
 	                            String childStr = serializer.writeToString(child);
-	                            
-	                            // validate the STIX here
-	                            JAXBContext stixContext = JAXBContext.newInstance(STIXPackage.class.getPackage().getName());
-	                            STIXPackage sp = STIXPackage.fromXMLString(childStr);
 	                            
 	                            // Append child string to output file.
 	                            fileWriter.append(childStr);

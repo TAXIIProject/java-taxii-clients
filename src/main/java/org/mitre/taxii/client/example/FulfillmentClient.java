@@ -47,6 +47,11 @@ public class FulfillmentClient extends AbstractClient {
         options.addOption(idOpt);
         options.addOption("result_part_number", true, "The part number being requested. Defaults to '1'.");
         
+        // add options for logging
+        options.addOption("proc_name", true, "process name");
+        options.addOption("subproc", true, "subprocess name");
+        options.addOption("env", true, "environment enumeration");
+        
         cli.parse(args);
         CommandLine cmd = cli.getCmd();
 

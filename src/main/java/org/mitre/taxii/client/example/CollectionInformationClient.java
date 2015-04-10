@@ -11,6 +11,7 @@ import java.net.URISyntaxException;
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Options;
 import org.mitre.taxii.messages.xml11.CollectionInformationRequest;
 import org.mitre.taxii.messages.xml11.MessageHelper;
 
@@ -41,6 +42,12 @@ public class CollectionInformationClient extends AbstractClient {
     private void processArgs(String[] args) throws MalformedURLException, JAXBException, IOException, URISyntaxException, Exception {
         // NOTE: Add custom cli options here.
         // cli.getOptions().addOption(option);
+        
+        // add options for logging
+        Options options = cli.getOptions();        
+        options.addOption("proc_name", true, "process name");
+        options.addOption("subproc", true, "subprocess name");
+        options.addOption("env", true, "environment enumeration");
         
         cli.parse(args);
         CommandLine cmd = cli.getCmd();

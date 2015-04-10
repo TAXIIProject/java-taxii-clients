@@ -161,34 +161,34 @@ abstract class AbstractClient {
     
     Object doCall(CommandLine cmd, Object request, CFMLogFields logger) throws JAXBException, IOException, URISyntaxException {
     	// validate the taxii
-        	Validation results;
-			try {
-				results = taxiiXml.validateFast(request, true);
-	        	if (results.hasWarnings()) {
-	        		logger.error(LogManager.getLogger(AbstractClient.class.getName()), "TAXII Validation Warning: {}", results.getAllWarnings());
-	        	}
-	        	if (results.hasErrors()) {
-	        		logger.updateState(State.ERROR);
-	        		logger.error(LogManager.getLogger(AbstractClient.class.getName()), "TAXII Validation Error: {}", results.getAllErrors());
-	        		return null;
-	        	}
-			} catch (SAXParseException e) {
-        		logger.updateState(State.ERROR);
-        		logger.error(LogManager.getLogger(AbstractClient.class.getName()), "TAXII Validation Error: {}", Validation.formatException(e));
-        		return null;
-	        } catch (SAXException e) {
-        		logger.updateState(State.ERROR);
-        		logger.error(LogManager.getLogger(AbstractClient.class.getName()), "TAXII Validation Error: {}", e);
-        		return null;
-			}
-        	
+//        	Validation results;
+//			try {
+//				results = taxiiXml.validateFast(request, true);
+//	        	if (results.hasWarnings()) {
+//	        		logger.error(LogManager.getLogger(AbstractClient.class.getName()), "TAXII Validation Warning: {}", results.getAllWarnings());
+//	        	}
+//	        	if (results.hasErrors()) {
+//	        		logger.updateState(State.ERROR);
+//	        		logger.error(LogManager.getLogger(AbstractClient.class.getName()), "TAXII Validation Error: {}", results.getAllErrors());
+//	        		return null;
+//	        	}
+//			} catch (SAXParseException e) {
+//        		logger.updateState(State.ERROR);
+//        		logger.error(LogManager.getLogger(AbstractClient.class.getName()), "TAXII Validation Error: {}", Validation.formatException(e));
+//        		return null;
+//	        } catch (SAXException e) {
+//        		logger.updateState(State.ERROR);
+//        		logger.error(LogManager.getLogger(AbstractClient.class.getName()), "TAXII Validation Error: {}", e);
+//        		return null;
+//			}
+//        	
         	String req = null;
             if (cmd.hasOption("xmloutput")) {
                 req = taxiiXml.marshalToString(request, true);
             } else {
                 req = PythonTextOutput.toText(request);
             }
-            logger.info(LogManager.getLogger(AbstractClient.class.getName()), "TAXII Request passed Validation");
+//            logger.info(LogManager.getLogger(AbstractClient.class.getName()), "TAXII Request passed Validation");
             logger.debug(LogManager.getLogger(AbstractClient.class.getName()), "Request: \n{}", req);
 
         
