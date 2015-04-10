@@ -145,9 +145,9 @@ public class InboxClient extends AbstractClient {
         Object response = doCall(cmd, request, logger);
 
         if (response instanceof StatusMessage) {
-        	logger.debug(ilog, "response: {}", response.toString());
         	StatusMessage msg = (StatusMessage)response;
         	if (msg.getStatusType().equals("SUCCESS")) {
+        		logger.updateState(State.SUCCESS);
         		logger.info(ilog, "{} uploaded successfully", contentFileName);
         		logger.info(ilog, "{} ", msg.getMessage());
         	} else {
