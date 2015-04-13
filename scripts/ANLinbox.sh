@@ -1,4 +1,5 @@
-#!  Run Basic Authentication TAXII Client to upload STIX file.
+#!/bin/bash
+# Run Basic Authentication TAXII Client to upload STIX file.
 # Parameters:
 # $1 = STIX content_binding e.g. urn:stix.mitre.org:xml:1.1.1
 # $2 = username on Soltra server
@@ -11,10 +12,9 @@
 #
 # if having trouble with ssl, try running with this property:  -Djavax.net.debug=ssl,handshake
 #
-java -Dlog4j.configurationFile=./log4j2.xml -cp ../java-taxii-clients-all.jar \
--content_binding $1 \
+java -Dlog4j.configurationFile=../log4j2.xml -cp ../java-taxii-clients-all.jar \
+ org.mitre.taxii.client.example.InboxClient -content_binding $1 \
 -username $2 -password $3 -env $4 \
 -content_file $5 \
 -destination_collection $6 \
--u $7 -xmloutput \
- org.mitre.taxii.client.example.InboxClient $*
+-u $7 -xmloutput
