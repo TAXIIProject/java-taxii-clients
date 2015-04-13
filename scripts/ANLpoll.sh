@@ -14,5 +14,5 @@ java -Dlog4j.configurationFile=./log4j2.xml -cp ../java-taxii-clients-all.jar \
 -collection $1 -subscription_id $2 \
 -username $3 -password $4 -env $5 \
 -dest_dir $6 \
--u $7 \
+-u $7 -xmloutput \
 org.mitre.taxii.client.example.PollClient $*
