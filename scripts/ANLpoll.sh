@@ -8,7 +8,9 @@
 # $6 = destination dir for downloaded stix files e.g. ./cfm
 # $7 = url of soltra server endpoint e.g. https://ht-sluff-2.it.anl.gov/taxii-discovery-service
 #
-java -cp ../java-taxii-clients-all.jar \
+# if having trouble with ssl, try running with this property:  -Djavax.net.debug=ssl,handshake
+#
+java -Dlog4j.configurationFile=./log4j2.xml -cp ../java-taxii-clients-all.jar \
 -collection $1 -subscription_id $2 \
 -username $3 -password $4 -env $5 \
 -dest_dir $6 \

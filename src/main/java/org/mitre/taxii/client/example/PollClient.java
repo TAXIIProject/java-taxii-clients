@@ -35,6 +35,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mitre.taxii.ContentBindings;
@@ -232,7 +233,8 @@ public class PollClient extends AbstractClient {
 	                    
 	                    Document doc = db.newDocument();
 	                    m.marshal(cb, doc);
-	                    m.marshal(cb,System.out);
+	                    if (plog.isEnabled(Level.DEBUG)) // checks ROOT level
+	                    	m.marshal(cb,System.out);
 	                    
 	                    /* NOTE: It is bad practice to rely on the namespace prefix being a certain value.
 	                    But in this case, the JAXB binding configuration dictates what it will be.
@@ -277,6 +279,10 @@ public class PollClient extends AbstractClient {
 	                        System.out.println(outFile.getCanonicalPath());
 	                        logger.info(plog, "Wrote Content to {}", filepath);
 	                    } // If Content element found.
+	                    else {
+	                    	logger.updateState(State.FAILURE);
+	        	            logger.warn(plog,"No Content Blocks found for {}",filename);
+	        	        }
 	                } catch (JAXBException|IOException ex) {
 	                	logger.updateState(State.ERROR);
 	                    logger.error(plog, null, ex);
@@ -291,6 +297,8 @@ public class PollClient extends AbstractClient {
 	                    }
 	                }
 	            }// for each ContentBlock
+	            logger.updateState(State.SUCCESS);
+		        logger.warn(plog,"{} content blocks processed.",blocks.size());
             } else {
             	logger.updateState(State.FAILURE);
 	            logger.warn(plog,"There were no Content Blocks returned");

@@ -7,7 +7,10 @@
 # $5 = content_file dir for downloaded stix files e.g. stix_upload.xml
 # $6 = destination_collection of soltra server feed e.g. 
 #
-java -cp ../java-taxii-clients-all.jar \
+#
+# if having trouble with ssl, try running with this property:  -Djavax.net.debug=ssl,handshake
+#
+java -Dlog4j.configurationFile=./log4j2.xml -cp ../java-taxii-clients-all.jar \
 -content_binding $1 \
 -username $2 -password $3 -env $4 \
 -content_file $5 \

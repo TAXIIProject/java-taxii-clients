@@ -10,4 +10,5 @@
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.mitre.taxii.client.example.PollClient"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-collection system.Default -subscription_id Default -username cfm -password CFMcm25# -env Development -dest_dir ./cfm -u https://ht-sluff-2.it.anl.gov/taxii-discovery-service/ -xmloutput"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="java-taxii-clients"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dlog4j.configurationFile=${project_loc}/log4j2.xml"/>
 </launchConfiguration>
