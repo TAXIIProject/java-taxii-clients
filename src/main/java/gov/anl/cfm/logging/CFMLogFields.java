@@ -27,11 +27,11 @@ public class CFMLogFields {
 		
 
 		public CFMMessage(CFMLogFields header, String messagePattern, Object arg) {
-			super(messagePattern.replace('\n', ' '), arg);
+			super(messagePattern, arg);
 			init(header);
 		}
 		public CFMMessage(CFMLogFields header, String messagePattern, Object...arguments) {
-			super(messagePattern.replace('\n', ' '), arguments);
+			super(messagePattern, arguments);
 			init(header);
 		}
 		public void setLogLevel(Level level) {
@@ -61,7 +61,8 @@ public class CFMLogFields {
 		
 		@Override
 		public String getFormattedMessage() {
-			mapMessage.put(TEXT_KEY, super.getFormattedMessage());
+			String msg = super.getFormattedMessage().replace('\n', ' ');
+			mapMessage.put(TEXT_KEY, msg);
 			return mapMessage.getFormattedMessage();
 		}
 		
