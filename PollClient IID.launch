@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/java-taxii-clients/src/main/java/org/mitre/taxii/client/example/PollClient.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.mitre.taxii.client.example.PollClient"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-collection search.indicator.ip  -username b84e5f9e83234e45bd3b02fdab6cdbdd8890b254c29e48ee909f3ff102672ac8  -password  dummy -env Development -dest_dir cfm -u https://api.activetrust.net/api/services/taxii/poll/ -xmloutput -X rlimit:2"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="java-taxii-clients"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dlog4j.configurationFile=${project_loc}/log4j2.xml"/>
+</launchConfiguration>

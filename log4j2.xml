@@ -25,9 +25,9 @@
     </Console>
   </Appenders>
   <Loggers>
-    <Root level="INFO">
-      <AppenderRef ref="Console" level="INFO"/>
-      <AppenderRef ref="TaxiiClient" level="INFO" />
+    <Root level="DEBUG">
+      <AppenderRef ref="Console" level="DEBUG"/>
+      <AppenderRef ref="TaxiiClient" level="DEBUG" />
 	  <!--  AppenderRef ref="syslog" level="WARN" /-->
     </Root>
   </Loggers>

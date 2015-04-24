@@ -16,6 +16,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -23,6 +24,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.Set;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -34,6 +38,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -89,7 +94,13 @@ public class PollClient extends AbstractClient {
         options.addOption("subproc", true, "subprocess name");
         options.addOption("env", true, "environment enumeration");
         
-        
+        // for Taxii Extended Headers
+        options.addOption(OptionBuilder.withArgName("extheaders").hasArgs(2)
+        				.withValueSeparator(':')
+        				.withDescription("Extend headers key:value pairs")
+        				.create("X"));
+
+         
         cli.parse(args);
         CommandLine cmd = cli.getCmd();
         
@@ -114,11 +125,24 @@ public class PollClient extends AbstractClient {
 
 
         taxiiClient = generateClient(cmd);
+        
+        // get any extended header properties
+        Properties props = cmd.getOptionProperties("X");
 
         // Prepare the message to send.
         PollRequest request = factory.createPollRequest()
                 .withMessageId(sessionID)
                 .withCollectionName(collection);
+        
+        // test for IID, which uses extended headers
+        if (!props.isEmpty()) {
+        	Set<Entry<Object,Object>> s = props.entrySet();
+        	for (Entry<Object,Object> e : s) {
+        		String key = e.getKey().toString();
+        		String val = e.getValue().toString();
+        		MessageHelper.addExtendedHeader(request, new URI(key), val);
+        	}
+        }
 
         if (null != subId) {
             request.setSubscriptionID(subId);
