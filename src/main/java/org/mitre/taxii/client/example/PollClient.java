@@ -338,7 +338,7 @@ public class PollClient extends AbstractClient {
 	 * @return Date
 	 */
 	public Date getLatestTime(String destDir) {
-		File dlDir = new File(destDir);
+		File dlDir = new File(destDir+"/..");
 		if (!dlDir.exists()) {
 			dlDir.mkdirs();
 		}
