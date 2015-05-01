@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/java-taxii-clients/src/main/java/org/mitre/taxii/client/example/InboxClient.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.mitre.taxii.client.example.InboxClient"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-content_binding  urn:stix.mitre.org:xml:1.1.1 -username cfm -password CFMcm25# -env Development -dcn testcfm -content_file ./cfm/uploads/system.Default_STIX111_t2015-04-13T185630.165299Z.xml -u https://ht-sluff-2.it.anl.gov/taxii-discovery-service/ -xmloutput"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="java-taxii-clients"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dlog4j.configurationFile=${workspace_loc}/java-taxii-clients/log4j2.xml"/>
+</launchConfiguration>

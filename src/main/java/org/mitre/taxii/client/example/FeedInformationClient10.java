@@ -5,8 +5,11 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Random;
+
 import javax.xml.bind.JAXBException;
+
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Options;
 import org.mitre.taxii.messages.xml10.FeedInformationRequest;
 import org.mitre.taxii.messages.xml10.ObjectFactory;
 import org.mitre.taxii.messages.xml10.TaxiiXmlFactory;
@@ -33,6 +36,12 @@ public class FeedInformationClient10 extends AbstractClient {
     private void processArgs(String[] args) throws MalformedURLException, JAXBException, IOException, URISyntaxException, Exception {
         // NOTE: Add custom cli options here.
         // cli.getOptions().addOption(option);
+        
+        // add options for logging
+        Options options = cli.getOptions();        
+        options.addOption("proc_name", true, "process name");
+        options.addOption("subproc", true, "subprocess name");
+        options.addOption("env", true, "environment enumeration");
         
         cli.parse(args);
         CommandLine cmd = cli.getCmd();

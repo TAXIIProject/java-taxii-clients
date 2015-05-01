@@ -1,4 +1,5 @@
 apply plugin: 'java'
+apply plugin: 'eclipse'
 
 // sourceCompatibility = '1.7'
 
@@ -17,9 +18,12 @@ if (!hasProperty('mainClass')) {
 
 repositories {
     mavenCentral()
+    maven { // Location for the TAXII Java library snapshots.
+        url "http://oss.sonatype.org/content/groups/public/"
+    }
     // You may define additional repositories, or even remove "mavenCentral()".
     // Read more about repositories here:
-    //   http://www.gradle.org/docs/current/userguide/dependency_management.html#sec:repositories
+    //   http://www.gradle.org/docs/current/userguide/dependency_management.html#sec:repositorie
 }
 
 dependencies {
@@ -35,8 +39,12 @@ dependencies {
     compile 'org.apache.httpcomponents:httpclient:4.3.5'
     compile 'org.apache.httpcomponents:httpclient-cache:4.3.5'
     compile 'org.apache.httpcomponents:httpmime:4.3.5'
-    compile 'org.apache.httpcomponents:fluent-hc:4.3.5'    
-    compile files('lib/java-taxii-1.1.jar')
+    compile 'org.apache.httpcomponents:fluent-hc:4.3.5'
+    compile 'org.mitre.taxii:taxii:1.1-SNAPSHOT'
+	
+    compile 'org.apache.logging.log4j:log4j-api:2.2'
+    compile 'org.apache.logging.log4j:log4j-core:2.2'
+  
 }
 
 task allJar(type: Jar) {
@@ -47,7 +55,7 @@ task allJar(type: Jar) {
 
 task dist << {
     ant.zip(destfile: "build/java-taxii-clients.zip") {
-        fileset(dir: ".", includes: "README.txt, LICENSE.txt") // The all important readme and license.
+        fileset(dir: ".", includes: "README.txt, LICENSE.txt, log4j2.xml") // The all important readme and license.
         fileset(dir: "build/libs", includes: "java-taxii-clients-all.jar") // The All-in-one .jar
         zipfileset(dir: "scripts", includes: "*.sh", prefix: "sh") // Get all the .sh scripts.
         zipfileset(dir: "scripts", includes: "*.bat", prefix: "bat") // Get all the .bat scripts.        

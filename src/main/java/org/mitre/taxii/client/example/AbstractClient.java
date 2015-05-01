@@ -1,5 +1,8 @@
 package org.mitre.taxii.client.example;
 
+import gov.anl.cfm.logging.CFMLogFields;
+import gov.anl.cfm.logging.CFMLogFields.State;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -28,11 +31,15 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.logging.log4j.LogManager;
 import org.mitre.taxii.client.HttpClient;
 import org.mitre.taxii.messages.TaxiiXml;
 import org.mitre.taxii.messages.xml11.ObjectFactory;
 import org.mitre.taxii.messages.xml11.PythonTextOutput;
 import org.mitre.taxii.messages.xml11.TaxiiXmlFactory;
+import org.mitre.taxii.util.Validation;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 /**
  * Provides a set of common command line handling methods and other things
@@ -49,7 +56,7 @@ abstract class AbstractClient {
     String defaultURL = "http://taxiitest.mitre.org/services/"; // If the "u" command line parameter is not provided, use this value.
 
     protected HttpClientContext context;
-        
+
     AbstractClient() {
     	this.cli = new Cli();
     	taxiiXml = txf.createTaxiiXml();
@@ -113,7 +120,6 @@ abstract class AbstractClient {
         } else {
             context = null;
         }
-
  /*   
 // TODO: Certificates and Key files is a rather rich and complicated subject. 
 // The python library supports a very specific implementation. Eventually support whatever the Python library supports.      
@@ -152,24 +158,50 @@ abstract class AbstractClient {
         return client;
     }    
     
-    Object doCall(CommandLine cmd, Object request) throws JAXBException, IOException, URISyntaxException{
-        
-            System.out.println("Request:");
+    Object doCall(CommandLine cmd, Object request, CFMLogFields logger) throws JAXBException, IOException, URISyntaxException {
+    	// validate the taxii
+//        	Validation results;
+//			try {
+//				results = taxiiXml.validateFast(request, true);
+//	        	if (results.hasWarnings()) {
+//	        		logger.error(LogManager.getLogger(AbstractClient.class.getName()), "TAXII Validation Warning: {}", results.getAllWarnings());
+//	        	}
+//	        	if (results.hasErrors()) {
+//	        		logger.updateState(State.ERROR);
+//	        		logger.error(LogManager.getLogger(AbstractClient.class.getName()), "TAXII Validation Error: {}", results.getAllErrors());
+//	        		return null;
+//	        	}
+//			} catch (SAXParseException e) {
+//        		logger.updateState(State.ERROR);
+//        		logger.error(LogManager.getLogger(AbstractClient.class.getName()), "TAXII Validation Error: {}", Validation.formatException(e));
+//        		return null;
+//	        } catch (SAXException e) {
+//        		logger.updateState(State.ERROR);
+//        		logger.error(LogManager.getLogger(AbstractClient.class.getName()), "TAXII Validation Error: {}", e);
+//        		return null;
+//			}
+//        	
+        	String req = null;
             if (cmd.hasOption("xmloutput")) {
-                System.out.println(taxiiXml.marshalToString(request, true));
+                req = taxiiXml.marshalToString(request, true);
             } else {
-                System.out.println(PythonTextOutput.toText(request));
+                req = PythonTextOutput.toText(request);
             }
+//            logger.info(LogManager.getLogger(AbstractClient.class.getName()), "TAXII Request passed Validation");
+            logger.debug(LogManager.getLogger(AbstractClient.class.getName()), "Request: \n{}", req);
+
         
         // Call the service
         Object responseObj = taxiiClient.callTaxiiService(new URI(cmd.getOptionValue("u", defaultURL)), request, context);
 
-        System.out.println("Response:");        
+        String resp = null;
         if (cmd.hasOption("xmloutput")) {
-            System.out.println(taxiiXml.marshalToString(responseObj, true));
+            resp = taxiiXml.marshalToString(responseObj, true);
         } else {
-            System.out.println(PythonTextOutput.toText(responseObj));
+            resp = PythonTextOutput.toText(responseObj);
         }
+        logger.debug(LogManager.getLogger(AbstractClient.class.getName()), "Response: \n{}", resp);
+
         
         return responseObj;
     }

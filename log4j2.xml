@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">  <!-- Change this to WARN after initial testing -->
+  <Appenders>
+<!--<Syslog name="test" format="RFC5424" host="kenobi-rh.it.anl.gov" port="514"
+    	protocol="TCP" appName="TaxiiClientBA" includeMDC="true" mdcId="mdc"
+    	facility="LOCAL1"  newLine="true"
+    	 >
+    	<LoggerFields>
+    	<KeyValuePair key="level" value="%level" />
+    	</LoggerFields>
+   	</Syslog>
+   	-->
+    <RollingFile name="TaxiiClient" filename="./log/TaxiiClient-BA.log" 
+    		filePattern="log/TaxiiClient-BA.%i"> <!--  if we want we can put .gz or .zip on the end and the rolled files will automatically compress -->
+    	<PatternLayout>
+    		<Pattern>%date{ISO8601} ${hostName} %-5p - %m%n</Pattern>
+    	</PatternLayout>
+    	<Policies>
+    		<!--<TimeBasedTriggeringPolicy />   now support time based rolling but I don't think it will auto delete older date files, only deletes based on the max # files which is within a date-->
+    		<SizeBasedTriggeringPolicy size="100 MB" />
+    	</Policies>
+    	<DefaultRolloverStrategy max="10" />
+    </RollingFile>    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level - %msg%n"/>
+    </Console>
+  </Appenders>
+  <Loggers>
+    <Root level="DEBUG">
+      <AppenderRef ref="Console" level="DEBUG"/>
+      <AppenderRef ref="TaxiiClient" level="DEBUG" />
+	  <!--  AppenderRef ref="syslog" level="WARN" /-->
+    </Root>
+  </Loggers>
+</Configuration>
