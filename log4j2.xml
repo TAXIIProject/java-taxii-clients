@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">  <!-- Change this to WARN after initial testing -->
   <Appenders>
-<!--<Syslog name="test" format="RFC5424" host="kenobi-rh.it.anl.gov" port="514"
+<!--<Syslog name="test" format="RFC5424" host="host-address" port="the-Port"
     	protocol="TCP" appName="TaxiiClientBA" includeMDC="true" mdcId="mdc"
     	facility="LOCAL1"  newLine="true"
     	 >
