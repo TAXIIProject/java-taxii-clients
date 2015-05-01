@@ -17,6 +17,9 @@ if (!hasProperty('mainClass')) {
 
 repositories {
     mavenCentral()
+    maven { // Location for the TAXII Java library snapshots.
+        url "http://oss.sonatype.org/content/groups/public/"
+    }
     // You may define additional repositories, or even remove "mavenCentral()".
     // Read more about repositories here:
     //   http://www.gradle.org/docs/current/userguide/dependency_management.html#sec:repositories
@@ -35,8 +38,8 @@ dependencies {
     compile 'org.apache.httpcomponents:httpclient:4.3.5'
     compile 'org.apache.httpcomponents:httpclient-cache:4.3.5'
     compile 'org.apache.httpcomponents:httpmime:4.3.5'
-    compile 'org.apache.httpcomponents:fluent-hc:4.3.5'    
-    compile files('lib/java-taxii-1.1.jar')
+    compile 'org.apache.httpcomponents:fluent-hc:4.3.5'
+    compile 'org.mitre.taxii:taxii:1.1-SNAPSHOT'
 }
 
 task allJar(type: Jar) {
