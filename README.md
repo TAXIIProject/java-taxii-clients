@@ -3,6 +3,8 @@
 A set of sample client classes that use the java-taxii library to send TAXII Messages invoking TAXII Services.
 For more information, see http://taxii.mitre.org/.
 
+[![Build Status](https://travis-ci.org/TAXIIProject/java-taxii-clients.svg?branch=master)](https://travis-ci.org/TAXIIProject/java-taxii-clients)
+
 ## Overview
 
 This project consists of several classes that utilize the java-taxii library to 
