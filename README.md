@@ -1,7 +1,7 @@
 # java-taxii-clients
 
 A set of sample client classes that use the java-taxii library to send TAXII Messages invoking TAXII Services.
-For more information, see http://taxii.mitre.org/.
+For more information, see http://taxiiproject.github.io/.
 
 [![Build Status](https://travis-ci.org/TAXIIProject/java-taxii-clients.svg?branch=master)](https://travis-ci.org/TAXIIProject/java-taxii-clients)
 
@@ -54,6 +54,4 @@ directory. Runnning a script with no arguments will bring up a help message.
 
 ## Feedback
 
-You are encouraged to provide feedback by commenting on open issues or 
-signing up for the [TAXII discussion list](http://taxii.mitre.org/community/registration.html)
-and posting your questions.
+Please provide feedback and/or comments on open issues to taxii@mitre.org.
