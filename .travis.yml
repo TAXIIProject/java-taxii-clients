@@ -1,9 +1,9 @@
 language: java
 jdk:
-    - oraclejdk8
-    - oraclejdk7
+  - oraclejdk8
+  - oraclejdk7
 
 notifications:
-    email:
-        - gback@mitre.org
-        - stix-commits-list@lists.mitre.org
+  email:
+    - gback@mitre.org
+    - stix-commits-list@lists.mitre.org
